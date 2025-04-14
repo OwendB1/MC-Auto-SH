@@ -34,13 +34,14 @@ fi
 
 CONTAINER_NAME=$(yq '.container_name' "$CONFIG_FILE")
 
-ACTION=$(whiptail --title "Server: $SELECTED_SERVER" --menu "Choose an action:" 20 60 10 \
+ACTION=$(whiptail --title "Server: $SELECTED_SERVER" --menu "Choose an action:" 20 60 12 \
   "1" "Start server" \
   "2" "Stop server" \
   "3" "Attach to console" \
-  "4" "Edit config environment variables" \
-  "5" "View itzg/minecraft-server help" \
-  "6" "Back to main menu" \
+  "4" "Edit Docker environment variables" \
+  "5" "Manage Config Variables (CFG_*)" \
+  "6" "View itzg/minecraft-server help" \
+  "7" "Back to main menu" \
   3>&1 1>&2 2>&3)
 
 case $ACTION in
@@ -61,18 +62,26 @@ case $ACTION in
     fi
     ;;
   4)
-    EDITED_KEY=$(whiptail --inputbox "Enter the name of the environment variable (e.g., MAX_PLAYERS):" 10 60 "" --title "Edit Environment Variable" 3>&1 1>&2 2>&3)
+    EDITED_KEY=$(whiptail --inputbox "Enter the Docker environment variable (e.g., MAX_PLAYERS):" 10 60 "" --title "Edit Docker Environment Variable" 3>&1 1>&2 2>&3)
     if [ -n "$EDITED_KEY" ]; then
       EDITED_VALUE=$(whiptail --inputbox "Enter the new value for $EDITED_KEY:" 10 60 "" --title "Set Value" 3>&1 1>&2 2>&3)
       yq -i ".env_vars.$EDITED_KEY = \"$EDITED_VALUE\"" "$CONFIG_FILE"
-      echo "[+] Updated $EDITED_KEY in $CONFIG_FILE"
+      echo "[+] Updated $EDITED_KEY in Docker env_vars."
     fi
     ;;
   5)
+    CFG_KEY=$(whiptail --inputbox "Enter config variable name (prefix with CFG_):" 10 60 "CFG_" --title "Edit Config Variable" 3>&1 1>&2 2>&3)
+    if [ -n "$CFG_KEY" ]; then
+      CFG_VAL=$(whiptail --inputbox "Enter value for $CFG_KEY (used in files like server.properties):" 10 60 "" --title "Set Config Value" 3>&1 1>&2 2>&3)
+      yq -i ".cfg_vars.$CFG_KEY = \"$CFG_VAL\"" "$CONFIG_FILE"
+      echo "[+] Updated $CFG_KEY in cfg_vars."
+    fi
+    ;;
+  6)
     echo "[+] Opening itzg/minecraft-server documentation in browser..."
     xdg-open "https://docker-minecraft-server.readthedocs.io/" &>/dev/null || open "https://docker-minecraft-server.readthedocs.io/"
     ;;
-  6)
+  7)
     echo "[+] Returning to main menu."
     ;;
   *)
