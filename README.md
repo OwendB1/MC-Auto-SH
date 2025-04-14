@@ -56,7 +56,7 @@ mc-auto-sh/
 - 🧪 Loader/version compatibility checker
 - 🧠 Performance presets (low-end, balanced, high)
 - 📦 Plugin support (Paper, Purpur, Spigot)
-- 🌐 Optional lightweight Web UI
+- 🌐 Reverse proxy integration (e.g. NGINX or Caddy)
 - 🔐 Dynamic DNS integration (e.g., DuckDNS)
 
 ## 📘 Docs
