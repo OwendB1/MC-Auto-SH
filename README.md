@@ -46,9 +46,18 @@ mc-auto-sh/
 ```
 
 ## 🧪 Coming Soon
-- Backup and restore utilities
-- Multi-user permissions
-- Remote server deployment support
+- 🔄 Backup & restore utilities (local and cloud storage)
+- 📊 Live resource monitoring (CPU, RAM, Docker stats)
+- ⚙️ Mod manager with CurseForge API integration
+- 🧠 Port conflict detection
+- ⏱️ Scheduled server start/stop via cron
+- 👥 Multi-user support / password protection
+- 🌍 Custom world seeds and generator settings
+- 🧪 Loader/version compatibility checker
+- 🧠 Performance presets (low-end, balanced, high)
+- 📦 Plugin support (Paper, Purpur, Spigot)
+- 🌐 Optional lightweight Web UI
+- 🔐 Dynamic DNS integration (e.g., DuckDNS)
 
 ## 📘 Docs
 Full documentation for the underlying Docker container is available at:
