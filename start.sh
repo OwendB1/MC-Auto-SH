@@ -22,6 +22,21 @@ update_self() {
   echo "[+] Scripts updated from latest MC-Auto-SH release."
 }
 
+fetch_env_var_docs() {
+  echo "[+] Updating Minecraft server env var documentation..."
+  VAR_CACHE="$HOME/.mc-auto-sh/vars-list.txt"
+  mkdir -p "$(dirname "$VAR_CACHE")"
+  
+  curl -sL "https://docker-minecraft-server.readthedocs.io/en/latest/variables/" |
+    sed -n '/<h2 id="/,/<\/table>/p' |  # Get the section with the env table
+    grep -E '<td>|<th>' |
+    sed -E 's/<[^>]+>//g' |            # Remove HTML tags
+    sed '/^\s*$/d' |                   # Remove empty lines
+    awk 'NR%2{printf "%s - ", $0; next}1' > "$VAR_CACHE"
+
+  echo "[+] Environment variable list cached to $VAR_CACHE"
+}
+
 # Auto-install dependencies
 echo "[+] Checking required dependencies..."
 if ! command_exists git; then
@@ -54,6 +69,9 @@ fi
 
 # Self-update scripts from MC-Auto-SH
 update_self
+
+# Fetch the latest Minecraft server environment variable documentation
+fetch_env_var_docs
 
 # Configure CurseForge API Key if not set
 if [ -z "$CF_API_KEY" ]; then
