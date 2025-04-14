@@ -3,6 +3,9 @@
 
 set -e
 
+CONFIG_FILE="$HOME/.mc-auto-sh-env"
+[ -f "$CONFIG_FILE" ] && source "$CONFIG_FILE"
+
 SERVER_ROOT="$HOME/mc-auto-sh/servers"
 mkdir -p "$SERVER_ROOT"
 

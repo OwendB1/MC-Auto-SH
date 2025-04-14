@@ -6,8 +6,12 @@ set -e
 REPO_URL="https://github.com/itzg/docker-minecraft-server"
 INSTALL_DIR="$HOME/mc-auto-sh"
 AUTO_SH_REPO="https://github.com/OwendB1/MC-Auto-SH"
+CONFIG_FILE="$HOME/.mc-auto-sh-env"
 
 command_exists() { command -v "$1" &>/dev/null; }
+
+# Load environment variables if config file exists
+[ -f "$CONFIG_FILE" ] && source "$CONFIG_FILE"
 
 update_self() {
   echo "[+] Checking for MC-Auto-SH updates..."
@@ -51,6 +55,15 @@ fi
 # Self-update scripts from MC-Auto-SH
 update_self
 
+# Configure CurseForge API Key if not set
+if [ -z "$CF_API_KEY" ]; then
+  if whiptail --yesno "Would you like to configure your CurseForge API key now?" 10 60 --title "CurseForge API Key"; then
+    CF_API_KEY=$(whiptail --inputbox "Paste your CurseForge API Key here:" 10 80 "" --title "Configure CurseForge API" 3>&1 1>&2 2>&3)
+    echo "export CF_API_KEY=\"$CF_API_KEY\"" > "$CONFIG_FILE"
+    echo "[+] CurseForge API key saved to $CONFIG_FILE"
+  fi
+fi
+
 cd "$INSTALL_DIR/scripts"
 
 # Whiptail Menu
@@ -58,7 +71,8 @@ CHOICE=$(whiptail --title "MC-Auto-SH Control Panel" --menu "Choose an action:" 
   1 "Configure a server" \
   2 "List of all servers / Monitor" \
   3 "Remove a server" \
-  4 "Exit" 3>&1 1>&2 2>&3)
+  4 "Manage CurseForge API Key" \
+  5 "Exit" 3>&1 1>&2 2>&3)
 
 case $CHOICE in
   1)
@@ -71,6 +85,26 @@ case $CHOICE in
     ./remove-server.sh
     ;;
   4)
+    API_ACTION=$(whiptail --title "Manage CurseForge API Key" --menu "What would you like to do?" 15 60 3 \
+      1 "Set/Update API Key" \
+      2 "Remove API Key" \
+      3 "Cancel" 3>&1 1>&2 2>&3)
+    case $API_ACTION in
+      1)
+        CF_API_KEY=$(whiptail --inputbox "Paste your new CurseForge API Key:" 10 80 "" --title "Update CurseForge API Key" 3>&1 1>&2 2>&3)
+        echo "export CF_API_KEY=\"$CF_API_KEY\"" > "$CONFIG_FILE"
+        echo "[+] API key updated in $CONFIG_FILE"
+        ;;
+      2)
+        rm -f "$CONFIG_FILE"
+        echo "[+] CurseForge API key removed."
+        ;;
+      3)
+        echo "[+] Cancelled."
+        ;;
+    esac
+    ;;
+  5)
     echo "Exiting."
     exit 0
     ;;

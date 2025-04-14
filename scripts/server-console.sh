@@ -28,7 +28,7 @@ fi
 
 CONFIG_FILE="$SERVER_ROOT/$SELECTED_SERVER/config.yaml"
 if [ ! -f "$CONFIG_FILE" ]; then
-  echo "[-] Config file not found for $SELECTED_SERVER."
+  echo "[-] Configuration file not found for $SELECTED_SERVER."
   exit 1
 fi
 
@@ -38,8 +38,9 @@ ACTION=$(whiptail --title "Server: $SELECTED_SERVER" --menu "Choose an action:" 
   "1" "Start server" \
   "2" "Stop server" \
   "3" "Attach to console" \
-  "4" "View itzg/minecraft-server help" \
-  "5" "Back to main menu" \
+  "4" "Edit config environment variables" \
+  "5" "View itzg/minecraft-server help" \
+  "6" "Back to main menu" \
   3>&1 1>&2 2>&3)
 
 case $ACTION in
@@ -60,10 +61,18 @@ case $ACTION in
     fi
     ;;
   4)
+    EDITED_KEY=$(whiptail --inputbox "Enter the name of the environment variable (e.g., MAX_PLAYERS):" 10 60 "" --title "Edit Environment Variable" 3>&1 1>&2 2>&3)
+    if [ -n "$EDITED_KEY" ]; then
+      EDITED_VALUE=$(whiptail --inputbox "Enter the new value for $EDITED_KEY:" 10 60 "" --title "Set Value" 3>&1 1>&2 2>&3)
+      yq -i ".env_vars.$EDITED_KEY = \"$EDITED_VALUE\"" "$CONFIG_FILE"
+      echo "[+] Updated $EDITED_KEY in $CONFIG_FILE"
+    fi
+    ;;
+  5)
     echo "[+] Opening itzg/minecraft-server documentation in browser..."
     xdg-open "https://docker-minecraft-server.readthedocs.io/" &>/dev/null || open "https://docker-minecraft-server.readthedocs.io/"
     ;;
-  5)
+  6)
     echo "[+] Returning to main menu."
     ;;
   *)
